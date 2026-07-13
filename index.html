@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xaerisoft Image Enhancer | Premium Local Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="universe-bg">
+        <div class="stars"></div>
+        <div class="aurora"></div>
+    </div>
+
+    <main class="container">
+        <!-- Header -->
+        <header class="glass-panel text-center">
+            <h1 class="glow-text">Xaerisoft Image Enhancer</h1>
+            <p class="subtitle">Created by: <strong>WillXD</strong></p>
+            <div class="privacy-badge">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+                100% Not Pishing
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            <!-- Upload Area -->
+            <div id="drop-zone" class="glass-panel upload-area">
+                <div class="upload-content">
+                    <span class="icon">🌌</span>
+                    <h2>Drag & Drop Gambar di sini</h2>
+                    <p>Pilih gambar</p>
+                    <input type="file" id="file-input" accept="image/*" hidden>
+                    <button class="btn-primary" onclick="document.getElementById('file-input').click()">Pilih Gambar</button>
+                </div>
+            </div>
+
+            <!-- Editor Area (Hidden by default) -->
+            <div id="editor-area" class="editor-layout" style="display: none;">
+                
+                <!-- Preview & Slider -->
+                <div class="preview-section glass-panel">
+                    <div id="loading-overlay">Memproses Resolusi Tinggi...</div>
+                    <div class="comparison-slider" id="slider-container">
+                        <img id="img-after" alt="After Enhancement">
+                        <div class="img-before-wrapper" id="before-wrapper">
+                            <img id="img-before" alt="Original Image">
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="slider" id="compare-slider">
+                        <div class="slider-line" id="slider-line">
+                            <div class="slider-button">↔</div>
+                        </div>
+                    </div>
+                    <div class="preview-labels">
+                        <span>Original</span>
+                        <span>Enhanced</span>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls-section glass-panel">
+                    <h3>Enhancement Tools</h3>
+                    
+                    <div class="control-group">
+                        <label>AI-Free Upscaling (Browser Algorithm)</label>
+                        <div class="btn-group">
+                            <button id="btn-1x" class="btn-scale active">1x (Original)</button>
+                            <button id="btn-2x" class="btn-scale">2x Scale</button>
+                            <button id="btn-4x" class="btn-scale">4x Scale</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Brightness: <span id="val-brightness">100%</span></label>
+                        <input type="range" id="brightness" min="0" max="200" value="100">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Contrast: <span id="val-contrast">100%</span></label>
+                        <input type="range" id="contrast" min="0" max="200" value="100">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Saturation: <span id="val-saturation">100%</span></label>
+                        <input type="range" id="saturation" min="0" max="200" value="100">
+                    </div>
+
+                    <div class="control-group">
+                        <label>Filter Lanjutan</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="sharpen"> Sharpen Image</label>
+                            <label><input type="checkbox" id="noise-reduction"> Simple Noise Reduction</label>
+                        </div>
+                    </div>
+
+                    <div class="control-group download-group">
+                        <select id="download-format" class="input-select">
+                            <option value="image/png">PNG (Lossless)</option>
+                            <option value="image/jpeg">JPG (High Quality)</option>
+                            <option value="image/webp">WEBP (Optimized)</option>
+                        </select>
+                        <button id="btn-download" class="btn-primary glow-btn">Download Hasil</button>
+                    </div>
+                    <button id="btn-reset" class="btn-secondary">Reset Gambar / Upload Baru</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Area -->
+        <div class="glass-panel history-section" id="history-section" style="display: none;">
+            <h3>History (Disimpan di LocalStorage Browser Anda)</h3>
+            <div id="history-gallery" class="history-gallery"></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
