@@ -180,11 +180,12 @@ canvas { position: absolute; transform-origin: center; transition: transform 0.1
 /* ==========================================================================
    MOBILE RESPONSIVE FIXES (Menghindari Layout Tergencet/Tabrakan)
    ========================================================================== */
-@media (max-width: 1024px) {
+@media (max-width: 1024px) { /* <- Pastikan hanya satu '@' di sini */
     .workspace-layout { flex-direction: column; }
     .controls-panel { width: 100%; flex-direction: column; gap: 1.5rem; }
-    .control-group.actions { flex-direction: row; } /* Process & Download sejajar di HP */
-    .preview-panel { min-height: 50vh; }
+    .control-group.actions { flex-direction: row; } 
+    /* Tambahkan order: -1 di bawah ini agar panel foto naik ke atas */
+    .preview-panel { min-height: 50vh; order: -1; }
 }
 @media (max-width: 600px) {
     .app-container { padding: 1rem; }
