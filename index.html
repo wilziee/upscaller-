@@ -15,49 +15,19 @@
     <main class="app-container">
         <!-- Header -->
         <header class="glass-panel">
-            <h1>✨ XAERISOFT <span>PRO</span></h1>
-            <p>Advanced AI Image Processing Engine</p>
+            <h1> XAERISOFT <span>Enchanced</span></h1>
+            <p>Tahap ini sedang uji coba</p>
         </header>
 
         <!-- Main Workspace -->
         <div class="workspace-layout">
             
-            <!-- Tools Panel -->
-            <aside class="controls-panel glass-panel">
-                <div class="control-group">
-                    <h3>AI Upscale Model</h3>
-                    <div class="btn-group grid-2">
-                        <button class="scale-btn active" data-scale="1">1×</button>
-                        <button class="scale-btn" data-scale="2">2×</button>
-                        <button class="scale-btn" data-scale="4">4×</button>
-                        <button class="scale-btn" data-scale="8">8×</button>
-                        <button class="scale-btn" data-scale="10">10×</button>
-                        <button class="scale-btn" data-scale="12">12×</button>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <h3>Export Quality (PNG)</h3>
-                    <div class="btn-group grid-2">
-                        <button class="quality-btn" data-quality="0.5">50%</button>
-                        <button class="quality-btn" data-quality="0.75">75%</button>
-                        <button class="quality-btn" data-quality="0.9">90%</button>
-                        <button class="quality-btn active" data-quality="1">100%</button>
-                    </div>
-                </div>
-
-                <div class="control-group actions">
-                    <button id="processBtn" class="neon-btn primary" disabled>🚀 Process AI</button>
-                    <button id="downloadBtn" class="neon-btn secondary" disabled>💾 Download</button>
-                </div>
-            </aside>
-
-            <!-- Canvas/Preview Area -->
+            <!-- Canvas/Preview Area (Sekarang di urutan pertama agar di atas saat buka di HP) -->
             <section class="preview-panel glass-panel" id="dropZone">
                 <div class="upload-prompt" id="uploadPrompt">
-                    <div class="icon">🌌</div>
-                    <h2>Drag & Drop Image Here</h2>
-                    <p>or click to browse</p>
+                    <div class="icon"></div>
+                    <h2>Output Gambar</h2>
+                    <p>klik disini</p>
                     <input type="file" id="fileInput" accept="image/*" hidden>
                 </div>
 
@@ -78,6 +48,37 @@
                     <button id="resetView">⟲</button>
                 </div>
             </section>
+
+            <!-- Tools Panel (Di urutan kedua agar di bawah saat buka di HP) -->
+            <aside class="controls-panel glass-panel">
+                <div class="control-group">
+                    <h3>Enchancer Model</h3>
+                    <div class="btn-group grid-2">
+                        <button class="scale-btn active" data-scale="1">1×</button>
+                        <button class="scale-btn" data-scale="2">2×</button>
+                        <button class="scale-btn" data-scale="4">4×</button>
+                        <button class="scale-btn" data-scale="8">8×</button>
+                        <button class="scale-btn" data-scale="10">10×</button>
+                        <button class="scale-btn" data-scale="12">12×</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Ekspor Rasio Gambar</h3>
+                    <div class="btn-group grid-2">
+                        <button class="quality-btn" data-quality="0.5">50%</button>
+                        <button class="quality-btn" data-quality="0.75">75%</button>
+                        <button class="quality-btn" data-quality="0.9">90%</button>
+                        <button class="quality-btn active" data-quality="1">100%</button>
+                    </div>
+                </div>
+
+                <div class="control-group actions">
+                    <button id="processBtn" class="neon-btn primary" disabled>🚀 Input Gambar</button>
+                    <button id="downloadBtn" class="neon-btn secondary" disabled>💾 Download</button>
+                </div>
+            </aside>
+
         </div>
     </main>
 
@@ -89,11 +90,11 @@
             <div class="core-ring core-ring-3"></div>
             <div class="core-glow"></div>
         </div>
-        <h2 class="status-text" id="statusText">Initializing AI Neural Net...</h2>
-        <div class="progress-bar-container">
+        <h2 class="status-text" id="statusText">Proses...</h2>
+        <div class="progress-bar-coantainer">
             <div class="progress-bar" id="progressBar"></div>
         </div>
-        <p class="eta" id="etaText">Estimated time: Calculating...</p>
+        <p class="eta" id="etaText">Waktu Estimasi: Menghitung...</p>
     </div>
 
     <script src="script.js"></script>

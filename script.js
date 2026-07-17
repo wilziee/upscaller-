@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // UI Elements
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const uploadPrompt = document.getElementById('uploadPrompt');
@@ -9,42 +8,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const afterCanvas = document.getElementById('afterCanvas');
     const sliderHandle = document.getElementById('sliderHandle');
     
-    // Buttons
     const processBtn = document.getElementById('processBtn');
     const downloadBtn = document.getElementById('downloadBtn');
     const scaleBtns = document.querySelectorAll('.scale-btn');
     const qualityBtns = document.querySelectorAll('.quality-btn');
     
-    // Overlay
     const loadingOverlay = document.getElementById('loadingOverlay');
     const progressBar = document.getElementById('progressBar');
     const statusText = document.getElementById('statusText');
     const etaText = document.getElementById('etaText');
 
-    // State Variables
     let originalImage = null;
     let processedBlob = null;
     let currentScale = 1;
     let currentQuality = 1;
     
-    // Pan & Zoom State
     let zoom = 1;
     let panX = 0; let panY = 0;
     let isDragging = false; let startX, startY;
     let isSliderDragging = false;
 
-    // Canvas Contexts
     const ctxBefore = beforeCanvas.getContext('2d');
     const ctxAfter = afterCanvas.getContext('2d');
 
-    // Mouse Glow Effect
     const mouseGlow = document.getElementById('mouseGlow');
     window.addEventListener('mousemove', (e) => {
         mouseGlow.style.left = e.clientX + 'px';
         mouseGlow.style.top = e.clientY + 'px';
     });
 
-    // Option Selectors
     scaleBtns.forEach(btn => btn.addEventListener('click', (e) => {
         scaleBtns.forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
@@ -57,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentQuality = parseFloat(e.target.dataset.quality);
     }));
 
-    // --- File Upload & Drag-Drop Logic ---
     dropZone.addEventListener('click', (e) => {
         if(e.target === uploadPrompt || uploadPrompt.contains(e.target)) fileInput.click();
     });
@@ -96,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         processBtn.disabled = false;
         downloadBtn.disabled = true;
 
-        // Set base dimensions fitting screen
         const maxDim = 800;
         let w = img.width; let h = img.height;
         if (w > maxDim || h > maxDim) {
@@ -107,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
         beforeCanvas.width = afterCanvas.width = img.width;
         beforeCanvas.height = afterCanvas.height = img.height;
         
-        // CSS display size
         beforeCanvas.style.width = afterCanvas.style.width = `${w}px`;
         beforeCanvas.style.height = afterCanvas.style.height = `${h}px`;
 
@@ -117,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resetPanZoom();
     }
 
-    // --- Compare Slider Logic ---
     sliderHandle.addEventListener('mousedown', () => isSliderDragging = true);
     window.addEventListener('mouseup', () => isSliderDragging = false);
     window.addEventListener('mousemove', (e) => {
@@ -128,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.setProperty('--clip-pos', `${percent}%`);
         sliderHandle.style.left = `${percent}%`;
     });
-    // Touch support for slider
+    
     sliderHandle.addEventListener('touchstart', () => isSliderDragging = true);
     window.addEventListener('touchend', () => isSliderDragging = false);
     window.addEventListener('touchmove', (e) => {
@@ -140,7 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sliderHandle.style.left = `${percent}%`;
     });
 
-    // --- Pan & Zoom Logic ---
     function applyTransform() {
         beforeCanvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
         afterCanvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
@@ -171,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTransform();
     });
 
-    // --- Web Worker & AI Processing ---
     processBtn.addEventListener('click', () => {
         if (!originalImage) return;
         
@@ -179,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         processBtn.disabled = true;
         const startTime = Date.now();
 
-        // Get ImageData
         const imageData = ctxBefore.getImageData(0, 0, beforeCanvas.width, beforeCanvas.height);
         
         const worker = new Worker('worker.js');
@@ -187,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         worker.postMessage({
             imageData: imageData,
             scale: currentScale
-        }, [imageData.data.buffer]); // Transfer buffer for performance
+        }, [imageData.data.buffer]);
 
         worker.onmessage = (e) => {
             const data = e.data;
@@ -195,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 progressBar.style.width = `${data.percent}%`;
                 statusText.innerText = data.task;
                 
-                // Calculate ETA
                 const elapsed = (Date.now() - startTime) / 1000;
                 if(data.percent > 0) {
                     const totalTime = elapsed / (data.percent / 100);
@@ -216,19 +200,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function handleProcessComplete(imgData, w, h) {
-        // Adjust Canvas sizes to new upscale
         afterCanvas.width = w;
         afterCanvas.height = h;
         
-        // Put data using temporary canvas to allow smooth scaling
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = w; tempCanvas.height = h;
         tempCanvas.getContext('2d').putImageData(imgData, 0, 0);
         
         ctxAfter.drawImage(tempCanvas, 0, 0);
 
-        // Prepare Download Blob based on Quality Setting
-        // If PNG output is mandatory, we scale dimensions for "quality" drop since PNG is lossless.
         const finalCanvas = document.createElement('canvas');
         finalCanvas.width = w * currentQuality;
         finalCanvas.height = h * currentQuality;
@@ -254,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
         etaText.innerText = '';
     }
 
-    // --- Download Logic ---
     downloadBtn.addEventListener('click', () => {
         if (!processedBlob) return;
         const url = URL.createObjectURL(processedBlob);

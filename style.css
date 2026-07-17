@@ -11,9 +11,7 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
 
-/* ==========================================================================
-   CRITICAL FIX: Bulletproof Hidden Class (Paling Atas Agar Prioritas 1)
-   ========================================================================== */
+/* CRITICAL FIX: Bulletproof Hidden Class */
 .hidden {
     display: none !important;
     visibility: hidden !important;
@@ -49,13 +47,11 @@ body {
     transform: translate(-50%, -50%); transition: 0.1s ease-out;
 }
 
-/* ==========================================================================
-   LAYOUT FIXES (Diganti dari height: 100vh menjadi min-height)
-   ========================================================================== */
+/* App Container & Layout */
 .app-container {
     max-width: 1400px; margin: 0 auto; padding: 1.5rem;
     display: flex; flex-direction: column; gap: 1.5rem;
-    min-height: 100vh; /* Memungkinkan HP untuk scroll ke bawah secara natural */
+    min-height: 100vh;
 }
 
 header { text-align: center; padding: 1rem; flex-shrink: 0; }
@@ -75,37 +71,6 @@ header p { color: var(--neon-blue); font-size: 1rem; margin-top: 5px; }
 .workspace-layout {
     display: flex; gap: 1.5rem; flex: 1; min-height: 0;
 }
-
-/* Controls Panel */
-.controls-panel {
-    width: 320px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; flex-shrink: 0;
-}
-
-.control-group h3 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.8rem; }
-
-/* FIX: Intelligent Grid System untuk Tombol (Mencegah Menumpuk) */
-.btn-group { display: grid; gap: 8px; }
-.control-group:nth-child(1) .btn-group { grid-template-columns: repeat(3, 1fr); } /* Baris Upscale jadi 3 kolom */
-.control-group:nth-child(2) .btn-group { grid-template-columns: repeat(2, 1fr); } /* Baris Quality jadi 2 kolom */
-
-button {
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-    color: white; padding: 10px; border-radius: 10px; cursor: pointer;
-    transition: all 0.3s ease; font-weight: 600; font-size: 0.85rem;
-}
-button:hover { background: rgba(255,255,255,0.1); }
-button.active {
-    background: rgba(176,38,255,0.2); border-color: var(--neon-purple);
-    box-shadow: 0 0 10px rgba(176,38,255,0.4); color: var(--neon-purple);
-}
-
-.control-group.actions { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
-.neon-btn { width: 100%; padding: 14px; font-size: 1rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-.neon-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none !important; }
-.neon-btn.primary { background: linear-gradient(45deg, #7b1fa2, #b026ff); border: none; box-shadow: 0 0 15px rgba(176,38,255,0.4); }
-.neon-btn.primary:hover:not(:disabled) { box-shadow: 0 0 25px rgba(176,38,255,0.8); transform: translateY(-2px); }
-.neon-btn.secondary { background: transparent; border: 2px solid var(--neon-blue); color: var(--neon-blue); }
-.neon-btn.secondary:hover:not(:disabled) { box-shadow: 0 0 15px rgba(0,210,255,0.4); background: rgba(0,210,255,0.1); }
 
 /* Preview Panel */
 .preview-panel {
@@ -153,8 +118,39 @@ canvas { position: absolute; transform-origin: center; transition: transform 0.1
     background: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 25px;
     display: flex; gap: 10px; align-items: center; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); z-index: 30;
 }
-.view-controls button { padding: 5px; border-radius: 50%; width: 30px; height: 30px; font-size: 0.9rem; }
+.view-controls button { padding: 5px; border-radius: 50%; width: 30px; height: 30px; font-size: 0.9rem; border: none; background: rgba(255,255,255,0.1); color: white; cursor: pointer;}
+.view-controls button:hover { background: rgba(255,255,255,0.3); }
 .view-controls span { font-weight: bold; font-family: monospace; font-size: 0.9rem; }
+
+/* Controls Panel */
+.controls-panel {
+    width: 320px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; flex-shrink: 0;
+}
+
+.control-group h3 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.8rem; }
+
+.btn-group { display: grid; gap: 8px; }
+.control-group:nth-child(1) .btn-group { grid-template-columns: repeat(3, 1fr); }
+.control-group:nth-child(2) .btn-group { grid-template-columns: repeat(2, 1fr); }
+
+button {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: white; padding: 10px; border-radius: 10px; cursor: pointer;
+    transition: all 0.3s ease; font-weight: 600; font-size: 0.85rem;
+}
+button:hover { background: rgba(255,255,255,0.1); }
+button.active {
+    background: rgba(176,38,255,0.2); border-color: var(--neon-purple);
+    box-shadow: 0 0 10px rgba(176,38,255,0.4); color: var(--neon-purple);
+}
+
+.control-group.actions { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+.neon-btn { width: 100%; padding: 14px; font-size: 1rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.neon-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none !important; }
+.neon-btn.primary { background: linear-gradient(45deg, #7b1fa2, #b026ff); border: none; box-shadow: 0 0 15px rgba(176,38,255,0.4); }
+.neon-btn.primary:hover:not(:disabled) { box-shadow: 0 0 25px rgba(176,38,255,0.8); transform: translateY(-2px); }
+.neon-btn.secondary { background: transparent; border: 2px solid var(--neon-blue); color: var(--neon-blue); }
+.neon-btn.secondary:hover:not(:disabled) { box-shadow: 0 0 15px rgba(0,210,255,0.4); background: rgba(0,210,255,0.1); }
 
 /* Processing Overlay */
 .processing-overlay {
@@ -178,19 +174,19 @@ canvas { position: absolute; transform-origin: center; transition: transform 0.1
 .eta { margin-top: 1rem; color: var(--text-muted); font-family: monospace; font-size: 0.9rem; }
 
 /* ==========================================================================
-   MOBILE RESPONSIVE FIXES (Menghindari Layout Tergencet/Tabrakan)
+   MOBILE RESPONSIVE (Sudah Rapi karena HTML ditukar)
    ========================================================================== */
-@media (max-width: 1024px) { /* <- Pastikan hanya satu '@' di sini */
+@media (max-width: 1024px) {
     .workspace-layout { flex-direction: column; }
     .controls-panel { width: 100%; flex-direction: column; gap: 1.5rem; }
     .control-group.actions { flex-direction: row; } 
-    /* Tambahkan order: -1 di bawah ini agar panel foto naik ke atas */
-    .preview-panel { min-height: 50vh; order: -1; }
+    .preview-panel { min-height: 50vh; }
 }
+
 @media (max-width: 600px) {
     .app-container { padding: 1rem; }
     header h1 { font-size: 1.8rem; }
     .control-group:nth-child(1) .btn-group { grid-template-columns: repeat(3, 1fr); }
-    .control-group.actions { flex-direction: column; } /* Susun vertikal jika HP sangat sempit */
+    .control-group.actions { flex-direction: column; }
     .upload-prompt h2 { font-size: 1.2rem; }
 }
