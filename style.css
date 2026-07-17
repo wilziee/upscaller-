@@ -98,7 +98,19 @@ header p { color: var(--neon-blue); font-size: 1rem; margin-top: 5px; }
 }
 .canvas-container:active { cursor: grabbing; }
 
-canvas { position: absolute; transform-origin: center; transition: transform 0.1s linear; max-width: none; pointer-events: none; }
+/* --- FIX: Tambahan property top, bottom, left, right, margin untuk posisi center --- */
+canvas { 
+    position: absolute; 
+    transform-origin: center; 
+    transition: transform 0.1s linear; 
+    max-width: none; 
+    pointer-events: none;
+    top: 0; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    margin: auto; 
+}
 #afterCanvas { clip-path: polygon(0 0, var(--clip-pos) 0, var(--clip-pos) 100%, 0 100%); }
 
 /* Slider */

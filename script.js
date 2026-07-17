@@ -94,13 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
             w *= ratio; h *= ratio;
         }
 
-        beforeCanvas.width = afterCanvas.width = img.width;
-        beforeCanvas.height = afterCanvas.height = img.height;
+        // --- FIX: Gunakan w dan h yang sudah dikecilkan agar RAM HP tidak crash ---
+        beforeCanvas.width = afterCanvas.width = w;
+        beforeCanvas.height = afterCanvas.height = h;
         
         beforeCanvas.style.width = afterCanvas.style.width = `${w}px`;
         beforeCanvas.style.height = afterCanvas.style.height = `${h}px`;
 
-        ctxBefore.drawImage(img, 0, 0);
+        // --- FIX: Draw image dengan ukuran w dan h ---
+        ctxBefore.drawImage(img, 0, 0, w, h);
         ctxAfter.clearRect(0, 0, afterCanvas.width, afterCanvas.height);
         
         resetPanZoom();
