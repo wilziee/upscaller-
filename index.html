@@ -2,118 +2,99 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xaerisoft Image Enhancer | Premium Local Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>✨ XAERISOFT IMAGE ENHANCER PRO</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Background Elements -->
-    <div class="universe-bg">
-        <div class="stars"></div>
-        <div class="aurora"></div>
-    </div>
+    <!-- Background Animations -->
+    <div class="universe-bg"></div>
+    <div class="stars" id="particles"></div>
+    <div class="mouse-glow" id="mouseGlow"></div>
 
-    <main class="container">
+    <main class="app-container">
         <!-- Header -->
-        <header class="glass-panel text-center">
-            <h1 class="glow-text">Xaerisoft Image Enhancer</h1>
-            <p class="subtitle">Created by: <strong>WillXD</strong></p>
-            <div class="privacy-badge">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-                100% Not Pishing
-            </div>
+        <header class="glass-panel">
+            <h1>✨ XAERISOFT <span>PRO</span></h1>
+            <p>Advanced AI Image Processing Engine</p>
         </header>
 
         <!-- Main Workspace -->
-        <div class="workspace">
-            <!-- Upload Area -->
-            <div id="drop-zone" class="glass-panel upload-area">
-                <div class="upload-content">
-                    <span class="icon">🌌</span>
-                    <h2>Drag & Drop Gambar di sini</h2>
-                    <p>Pilih gambar</p>
-                    <input type="file" id="file-input" accept="image/*" hidden>
-                    <button class="btn-primary" onclick="document.getElementById('file-input').click()">Pilih Gambar</button>
-                </div>
-            </div>
-
-            <!-- Editor Area (Hidden by default) -->
-            <div id="editor-area" class="editor-layout" style="display: none;">
-                
-                <!-- Preview & Slider -->
-                <div class="preview-section glass-panel">
-                    <div id="loading-overlay">Memproses Resolusi Tinggi...</div>
-                    <div class="comparison-slider" id="slider-container">
-                        <img id="img-after" alt="After Enhancement">
-                        <div class="img-before-wrapper" id="before-wrapper">
-                            <img id="img-before" alt="Original Image">
-                        </div>
-                        <input type="range" min="0" max="100" value="50" class="slider" id="compare-slider">
-                        <div class="slider-line" id="slider-line">
-                            <div class="slider-button">↔</div>
-                        </div>
-                    </div>
-                    <div class="preview-labels">
-                        <span>Original</span>
-                        <span>Enhanced</span>
+        <div class="workspace-layout">
+            
+            <!-- Tools Panel -->
+            <aside class="controls-panel glass-panel">
+                <div class="control-group">
+                    <h3>AI Upscale Model</h3>
+                    <div class="btn-group grid-2">
+                        <button class="scale-btn active" data-scale="1">1×</button>
+                        <button class="scale-btn" data-scale="2">2×</button>
+                        <button class="scale-btn" data-scale="4">4×</button>
+                        <button class="scale-btn" data-scale="8">8×</button>
+                        <button class="scale-btn" data-scale="10">10×</button>
+                        <button class="scale-btn" data-scale="12">12×</button>
                     </div>
                 </div>
 
-                <!-- Controls -->
-                <div class="controls-section glass-panel">
-                    <h3>Enhancement Tools</h3>
-                    
-                    <div class="control-group">
-                        <label>AI-Free Upscaling (Browser Algorithm)</label>
-                        <div class="btn-group">
-                            <button id="btn-1x" class="btn-scale active">1x (Original)</button>
-                            <button id="btn-2x" class="btn-scale">2x Scale</button>
-                            <button id="btn-4x" class="btn-scale">4x Scale</button>
-                        </div>
+                <div class="control-group">
+                    <h3>Export Quality (PNG)</h3>
+                    <div class="btn-group grid-2">
+                        <button class="quality-btn" data-quality="0.5">50%</button>
+                        <button class="quality-btn" data-quality="0.75">75%</button>
+                        <button class="quality-btn" data-quality="0.9">90%</button>
+                        <button class="quality-btn active" data-quality="1">100%</button>
                     </div>
-
-                    <div class="control-group">
-                        <label>Brightness: <span id="val-brightness">100%</span></label>
-                        <input type="range" id="brightness" min="0" max="200" value="100">
-                    </div>
-                    
-                    <div class="control-group">
-                        <label>Contrast: <span id="val-contrast">100%</span></label>
-                        <input type="range" id="contrast" min="0" max="200" value="100">
-                    </div>
-                    
-                    <div class="control-group">
-                        <label>Saturation: <span id="val-saturation">100%</span></label>
-                        <input type="range" id="saturation" min="0" max="200" value="100">
-                    </div>
-
-                    <div class="control-group">
-                        <label>Filter Lanjutan</label>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" id="sharpen"> Sharpen Image</label>
-                            <label><input type="checkbox" id="noise-reduction"> Simple Noise Reduction</label>
-                        </div>
-                    </div>
-
-                    <div class="control-group download-group">
-                        <select id="download-format" class="input-select">
-                            <option value="image/png">PNG (Lossless)</option>
-                            <option value="image/jpeg">JPG (High Quality)</option>
-                            <option value="image/webp">WEBP (Optimized)</option>
-                        </select>
-                        <button id="btn-download" class="btn-primary glow-btn">Download Hasil</button>
-                    </div>
-                    <button id="btn-reset" class="btn-secondary">Reset Gambar / Upload Baru</button>
                 </div>
-            </div>
-        </div>
 
-        <!-- History Area -->
-        <div class="glass-panel history-section" id="history-section" style="display: none;">
-            <h3>History (Disimpan di LocalStorage Browser Anda)</h3>
-            <div id="history-gallery" class="history-gallery"></div>
+                <div class="control-group actions">
+                    <button id="processBtn" class="neon-btn primary" disabled>🚀 Process AI</button>
+                    <button id="downloadBtn" class="neon-btn secondary" disabled>💾 Download</button>
+                </div>
+            </aside>
+
+            <!-- Canvas/Preview Area -->
+            <section class="preview-panel glass-panel" id="dropZone">
+                <div class="upload-prompt" id="uploadPrompt">
+                    <div class="icon">🌌</div>
+                    <h2>Drag & Drop Image Here</h2>
+                    <p>or click to browse</p>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+
+                <div class="canvas-container hidden" id="canvasContainer">
+                    <canvas id="beforeCanvas"></canvas>
+                    <canvas id="afterCanvas"></canvas>
+                    <div class="slider-handle" id="sliderHandle">
+                        <div class="slider-line"></div>
+                        <div class="slider-button">⇹</div>
+                    </div>
+                </div>
+
+                <!-- Zoom & Pan Controls -->
+                <div class="view-controls hidden" id="viewControls">
+                    <button id="zoomOut">➖</button>
+                    <span id="zoomLevel">100%</span>
+                    <button id="zoomIn">➕</button>
+                    <button id="resetView">⟲</button>
+                </div>
+            </section>
         </div>
     </main>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay hidden" id="loadingOverlay">
+        <div class="ai-core">
+            <div class="core-ring core-ring-1"></div>
+            <div class="core-ring core-ring-2"></div>
+            <div class="core-ring core-ring-3"></div>
+            <div class="core-glow"></div>
+        </div>
+        <h2 class="status-text" id="statusText">Initializing AI Neural Net...</h2>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="eta" id="etaText">Estimated time: Calculating...</p>
+    </div>
 
     <script src="script.js"></script>
 </body>
