@@ -1,341 +1,269 @@
-/**
- * Xaerisoft Image Enhancer
- * Created by: WillXD
- * Logic: 100% Local Browser Processing via Canvas API
- */
+document.addEventListener('DOMContentLoaded', () => {
+    // UI Elements
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const viewControls = document.getElementById('viewControls');
+    const beforeCanvas = document.getElementById('beforeCanvas');
+    const afterCanvas = document.getElementById('afterCanvas');
+    const sliderHandle = document.getElementById('sliderHandle');
+    
+    // Buttons
+    const processBtn = document.getElementById('processBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const scaleBtns = document.querySelectorAll('.scale-btn');
+    const qualityBtns = document.querySelectorAll('.quality-btn');
+    
+    // Overlay
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+    const etaText = document.getElementById('etaText');
 
-// DOM Elements
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-const editorArea = document.getElementById('editor-area');
-const btnReset = document.getElementById('btn-reset');
-const loadingOverlay = document.getElementById('loading-overlay');
+    // State Variables
+    let originalImage = null;
+    let processedBlob = null;
+    let currentScale = 1;
+    let currentQuality = 1;
+    
+    // Pan & Zoom State
+    let zoom = 1;
+    let panX = 0; let panY = 0;
+    let isDragging = false; let startX, startY;
+    let isSliderDragging = false;
 
-// Preview Elements
-const imgBefore = document.getElementById('img-before');
-const imgAfter = document.getElementById('img-after');
-const slider = document.getElementById('compare-slider');
-const beforeWrapper = document.getElementById('before-wrapper');
-const sliderLine = document.getElementById('slider-line');
+    // Canvas Contexts
+    const ctxBefore = beforeCanvas.getContext('2d');
+    const ctxAfter = afterCanvas.getContext('2d');
 
-// Controls Elements
-const controls = {
-    b: document.getElementById('brightness'),
-    c: document.getElementById('contrast'),
-    s: document.getElementById('saturation'),
-    valB: document.getElementById('val-brightness'),
-    valC: document.getElementById('val-contrast'),
-    valS: document.getElementById('val-saturation'),
-    sharpen: document.getElementById('sharpen'),
-    noise: document.getElementById('noise-reduction')
-};
-const scaleBtns = document.querySelectorAll('.btn-scale');
-const downloadBtn = document.getElementById('btn-download');
-const downloadFormat = document.getElementById('download-format');
+    // Mouse Glow Effect
+    const mouseGlow = document.getElementById('mouseGlow');
+    window.addEventListener('mousemove', (e) => {
+        mouseGlow.style.left = e.clientX + 'px';
+        mouseGlow.style.top = e.clientY + 'px';
+    });
 
-// History
-const historyGallery = document.getElementById('history-gallery');
-const historySection = document.getElementById('history-section');
-
-// State Variables
-let originalImage = new Image();
-let originalFileName = "image";
-let currentScale = 1;
-let processTimeout = null;
-
-// ==========================================
-// 1. Initialization & Event Listeners
-// ==========================================
-
-// Drag & Drop
-dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('dragover');
-});
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
-    if (e.dataTransfer.files.length) loadImage(e.dataTransfer.files[0]);
-});
-
-// Input File & Paste
-fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length) loadImage(e.target.files[0]);
-});
-window.addEventListener('paste', (e) => {
-    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-    for (let item of items) {
-        if (item.type.indexOf('image') === 0) {
-            loadImage(item.getAsFile());
-            break;
-        }
-    }
-});
-
-// Comparison Slider
-slider.addEventListener('input', (e) => {
-    const value = e.target.value;
-    beforeWrapper.style.width = `${value}%`;
-    sliderLine.style.left = `${value}%`;
-});
-
-// Setting Controls (Debounced for performance)
-const updateLabels = () => {
-    controls.valB.innerText = `${controls.b.value}%`;
-    controls.valC.innerText = `${controls.c.value}%`;
-    controls.valS.innerText = `${controls.s.value}%`;
-};
-
-Object.values(controls).forEach(el => {
-    if(el.tagName === 'INPUT') {
-        el.addEventListener('input', () => {
-            if(el.type === 'range') updateLabels();
-            clearTimeout(processTimeout);
-            // Delay rendering to prevent lag during slider dragging
-            processTimeout = setTimeout(() => requestProcess(), 100); 
-        });
-    }
-});
-
-// Scale Buttons
-scaleBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    // Option Selectors
+    scaleBtns.forEach(btn => btn.addEventListener('click', (e) => {
         scaleBtns.forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
-        if (e.target.id === 'btn-1x') currentScale = 1;
-        if (e.target.id === 'btn-2x') currentScale = 2;
-        if (e.target.id === 'btn-4x') currentScale = 4;
-        requestProcess();
+        currentScale = parseFloat(e.target.dataset.scale);
+    }));
+
+    qualityBtns.forEach(btn => btn.addEventListener('click', (e) => {
+        qualityBtns.forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        currentQuality = parseFloat(e.target.dataset.quality);
+    }));
+
+    // --- File Upload & Drag-Drop Logic ---
+    dropZone.addEventListener('click', (e) => {
+        if(e.target === uploadPrompt || uploadPrompt.contains(e.target)) fileInput.click();
+    });
+
+    fileInput.addEventListener('change', handleFileSelect);
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadPrompt.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => uploadPrompt.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault(); uploadPrompt.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect();
+        }
+    });
+
+    function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (!file || !file.type.startsWith('image/')) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                originalImage = img;
+                setupWorkspace(img);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function setupWorkspace(img) {
+        uploadPrompt.classList.add('hidden');
+        canvasContainer.classList.remove('hidden');
+        viewControls.classList.remove('hidden');
+        processBtn.disabled = false;
+        downloadBtn.disabled = true;
+
+        // Set base dimensions fitting screen
+        const maxDim = 800;
+        let w = img.width; let h = img.height;
+        if (w > maxDim || h > maxDim) {
+            const ratio = Math.min(maxDim / w, maxDim / h);
+            w *= ratio; h *= ratio;
+        }
+
+        beforeCanvas.width = afterCanvas.width = img.width;
+        beforeCanvas.height = afterCanvas.height = img.height;
+        
+        // CSS display size
+        beforeCanvas.style.width = afterCanvas.style.width = `${w}px`;
+        beforeCanvas.style.height = afterCanvas.style.height = `${h}px`;
+
+        ctxBefore.drawImage(img, 0, 0);
+        ctxAfter.clearRect(0, 0, afterCanvas.width, afterCanvas.height);
+        
+        resetPanZoom();
+    }
+
+    // --- Compare Slider Logic ---
+    sliderHandle.addEventListener('mousedown', () => isSliderDragging = true);
+    window.addEventListener('mouseup', () => isSliderDragging = false);
+    window.addEventListener('mousemove', (e) => {
+        if (!isSliderDragging) return;
+        const rect = canvasContainer.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+        document.documentElement.style.setProperty('--clip-pos', `${percent}%`);
+        sliderHandle.style.left = `${percent}%`;
+    });
+    // Touch support for slider
+    sliderHandle.addEventListener('touchstart', () => isSliderDragging = true);
+    window.addEventListener('touchend', () => isSliderDragging = false);
+    window.addEventListener('touchmove', (e) => {
+        if (!isSliderDragging) return;
+        const rect = canvasContainer.getBoundingClientRect();
+        let x = e.touches[0].clientX - rect.left;
+        let percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+        document.documentElement.style.setProperty('--clip-pos', `${percent}%`);
+        sliderHandle.style.left = `${percent}%`;
+    });
+
+    // --- Pan & Zoom Logic ---
+    function applyTransform() {
+        beforeCanvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+        afterCanvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+        document.getElementById('zoomLevel').innerText = `${Math.round(zoom * 100)}%`;
+    }
+
+    function resetPanZoom() { zoom = 1; panX = 0; panY = 0; applyTransform(); }
+    document.getElementById('resetView').addEventListener('click', resetPanZoom);
+    document.getElementById('zoomIn').addEventListener('click', () => { zoom *= 1.2; applyTransform(); });
+    document.getElementById('zoomOut').addEventListener('click', () => { zoom /= 1.2; applyTransform(); });
+
+    canvasContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const zoomIntensity = 0.1;
+        if (e.deltaY < 0) zoom *= (1 + zoomIntensity);
+        else zoom /= (1 + zoomIntensity);
+        applyTransform();
+    });
+
+    canvasContainer.addEventListener('mousedown', (e) => {
+        if (e.target === sliderHandle || sliderHandle.contains(e.target)) return;
+        isDragging = true; startX = e.clientX - panX; startY = e.clientY - panY;
+    });
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        panX = e.clientX - startX; panY = e.clientY - startY;
+        applyTransform();
+    });
+
+    // --- Web Worker & AI Processing ---
+    processBtn.addEventListener('click', () => {
+        if (!originalImage) return;
+        
+        loadingOverlay.classList.remove('hidden');
+        processBtn.disabled = true;
+        const startTime = Date.now();
+
+        // Get ImageData
+        const imageData = ctxBefore.getImageData(0, 0, beforeCanvas.width, beforeCanvas.height);
+        
+        const worker = new Worker('worker.js');
+        
+        worker.postMessage({
+            imageData: imageData,
+            scale: currentScale
+        }, [imageData.data.buffer]); // Transfer buffer for performance
+
+        worker.onmessage = (e) => {
+            const data = e.data;
+            if (data.type === 'progress') {
+                progressBar.style.width = `${data.percent}%`;
+                statusText.innerText = data.task;
+                
+                // Calculate ETA
+                const elapsed = (Date.now() - startTime) / 1000;
+                if(data.percent > 0) {
+                    const totalTime = elapsed / (data.percent / 100);
+                    const remaining = Math.max(0, Math.round(totalTime - elapsed));
+                    etaText.innerText = `Estimated time: ${remaining}s remaining`;
+                }
+            } 
+            else if (data.type === 'done') {
+                handleProcessComplete(data.imageData, data.width, data.height);
+                worker.terminate();
+            }
+            else if (data.type === 'error') {
+                alert('Processing Error: ' + data.message);
+                resetUI();
+                worker.terminate();
+            }
+        };
+    });
+
+    function handleProcessComplete(imgData, w, h) {
+        // Adjust Canvas sizes to new upscale
+        afterCanvas.width = w;
+        afterCanvas.height = h;
+        
+        // Put data using temporary canvas to allow smooth scaling
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = w; tempCanvas.height = h;
+        tempCanvas.getContext('2d').putImageData(imgData, 0, 0);
+        
+        ctxAfter.drawImage(tempCanvas, 0, 0);
+
+        // Prepare Download Blob based on Quality Setting
+        // If PNG output is mandatory, we scale dimensions for "quality" drop since PNG is lossless.
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = w * currentQuality;
+        finalCanvas.height = h * currentQuality;
+        const fctx = finalCanvas.getContext('2d');
+        fctx.imageSmoothingEnabled = true;
+        fctx.imageSmoothingQuality = 'high';
+        fctx.drawImage(tempCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+
+        finalCanvas.toBlob((blob) => {
+            processedBlob = blob;
+            downloadBtn.disabled = false;
+            resetUI();
+            document.documentElement.style.setProperty('--clip-pos', `50%`);
+            sliderHandle.style.left = `50%`;
+        }, 'image/png');
+    }
+
+    function resetUI() {
+        loadingOverlay.classList.add('hidden');
+        processBtn.disabled = false;
+        progressBar.style.width = '0%';
+        statusText.innerText = 'Initializing...';
+        etaText.innerText = '';
+    }
+
+    // --- Download Logic ---
+    downloadBtn.addEventListener('click', () => {
+        if (!processedBlob) return;
+        const url = URL.createObjectURL(processedBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Xaerisoft_Enhanced_${currentScale}x_Q${currentQuality*100}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     });
 });
-
-// Reset
-btnReset.addEventListener('click', () => {
-    dropZone.style.display = 'block';
-    editorArea.style.display = 'none';
-    fileInput.value = '';
-    // Reset controls
-    controls.b.value = 100; controls.c.value = 100; controls.s.value = 100;
-    controls.sharpen.checked = false; controls.noise.checked = false;
-    currentScale = 1; updateLabels();
-    scaleBtns.forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-1x').classList.add('active');
-});
-
-// Download
-downloadBtn.addEventListener('click', () => {
-    downloadFinalImage();
-});
-
-// ==========================================
-// 2. Image Loading
-// ==========================================
-function loadImage(file) {
-    if (!file || !file.type.startsWith('image/')) {
-        alert('Mohon masukkan file gambar yang valid.');
-        return;
-    }
-    
-    originalFileName = file.name.split('.')[0] || "xaerisoft-image";
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-        originalImage.onload = () => {
-            imgBefore.src = originalImage.src;
-            dropZone.style.display = 'none';
-            editorArea.style.display = 'grid';
-            
-            // Simpan thumbnail history
-            saveToHistory(originalImage.src);
-
-            // Proses awal
-            requestProcess();
-        };
-        originalImage.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-// ==========================================
-// 3. Image Processing (Canvas API)
-// ==========================================
-function requestProcess() {
-    loadingOverlay.style.display = 'flex';
-    // Beri waktu UI untuk render overlay sebelum blocking thread dengan render
-    setTimeout(processAndRender, 50); 
-}
-
-function processAndRender() {
-    // 1. Buat Canvas
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    
-    const targetWidth = originalImage.width * currentScale;
-    const targetHeight = originalImage.height * currentScale;
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-
-    // Browser High-Quality Smoothing
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-
-    // 2. Terapkan Filter Dasar (Brightness, Contrast, Saturation) via CSS Filter di Canvas
-    const b = controls.b.value;
-    const c = controls.c.value;
-    const s = controls.s.value;
-    ctx.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%)`;
-    
-    // Gambar ke canvas
-    ctx.drawImage(originalImage, 0, 0, targetWidth, targetHeight);
-    
-    // Reset filter untuk proses pixel manual
-    ctx.filter = 'none';
-
-    // 3. Terapkan Reduksi Noise Sederhana (Fake Median / Slight Blur Blend)
-    if (controls.noise.checked) {
-        ctx.globalAlpha = 0.5;
-        // Draw slightly offset untuk efek blur/reduksi noise ringan
-        ctx.drawImage(canvas, 1, 1);
-        ctx.drawImage(canvas, -1, -1);
-        ctx.globalAlpha = 1.0;
-    }
-
-    // 4. Terapkan Sharpen (Convolution Matrix) jika dicentang
-    if (controls.sharpen.checked) {
-        applySharpenFilter(ctx, targetWidth, targetHeight);
-    }
-
-    // Tampilkan ke UI Preview
-    imgAfter.src = canvas.toDataURL('image/jpeg', 0.9); // Gunakan JPEG untuk preview agar performa browser tetap cepat
-    
-    // Simpan canvas tersembunyi ke memori untuk di-download nanti
-    window.finalCanvas = canvas; 
-    
-    loadingOverlay.style.display = 'none';
-}
-
-// Algoritma Sharpen Sederhana (3x3 Matrix)
-function applySharpenFilter(ctx, w, h) {
-    const imageData = ctx.getImageData(0, 0, w, h);
-    const data = imageData.data;
-    
-    // Mengamankan copy data origin
-    const buff = new Uint8ClampedArray(data);
-    
-    // Matrix Sharpen Standar
-    const weights = [
-         0, -1,  0,
-        -1,  5, -1,
-         0, -1,  0
-    ];
-    
-    const side = Math.round(Math.sqrt(weights.length));
-    const halfSide = Math.floor(side / 2);
-    
-    // Iterasi piksel (Lewati pinggiran untuk performa)
-    for (let y = 1; y < h - 1; y++) {
-        for (let x = 1; x < w - 1; x++) {
-            const dstOff = (y * w + x) * 4;
-            let r = 0, g = 0, b = 0;
-            
-            for (let cy = 0; cy < side; cy++) {
-                for (let cx = 0; cx < side; cx++) {
-                    const scy = y + cy - halfSide;
-                    const scx = x + cx - halfSide;
-                    const srcOff = (scy * w + scx) * 4;
-                    const wt = weights[cy * side + cx];
-                    
-                    r += buff[srcOff] * wt;
-                    g += buff[srcOff + 1] * wt;
-                    b += buff[srcOff + 2] * wt;
-                }
-            }
-            
-            data[dstOff] = r;
-            data[dstOff + 1] = g;
-            data[dstOff + 2] = b;
-        }
-    }
-    
-    ctx.putImageData(imageData, 0, 0);
-}
-
-// ==========================================
-// 4. Download Export
-// ==========================================
-function downloadFinalImage() {
-    if (!window.finalCanvas) return;
-    
-    const mime = downloadFormat.value;
-    const ext = mime.split('/')[1];
-    const quality = mime === 'image/jpeg' || mime === 'image/webp' ? 0.95 : 1.0;
-    
-    const dataURL = window.finalCanvas.toDataURL(mime, quality);
-    const a = document.createElement('a');
-    a.href = dataURL;
-    a.download = `${originalFileName}_Xaerisoft_Enhanced.${ext}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-// ==========================================
-// 5. Local Storage History
-// ==========================================
-function saveToHistory(base64Image) {
-    // Karena quota LocalStorage terbatas (~5MB), kita simpan thumbnail resolusi kecil saja
-    const thumbCanvas = document.createElement('canvas');
-    const thumbCtx = thumbCanvas.getContext('2d');
-    
-    // Skala thumbnail
-    const MAX_SIZE = 150;
-    let tw = originalImage.width;
-    let th = originalImage.height;
-    if (tw > th) { if (tw > MAX_SIZE) { th *= MAX_SIZE / tw; tw = MAX_SIZE; } } 
-    else { if (th > MAX_SIZE) { tw *= MAX_SIZE / th; th = MAX_SIZE; } }
-    
-    thumbCanvas.width = tw;
-    thumbCanvas.height = th;
-    thumbCtx.drawImage(originalImage, 0, 0, tw, th);
-    const thumbDataUrl = thumbCanvas.toDataURL('image/jpeg', 0.7);
-
-    // Ambil histori lama
-    let history = JSON.parse(localStorage.getItem('xaerisoft_history') || '[]');
-    const newItem = {
-        date: new Date().toLocaleTimeString(),
-        thumb: thumbDataUrl
-    };
-    
-    history.unshift(newItem);
-    if(history.length > 8) history.pop(); // Max 8 item
-    
-    try {
-        localStorage.setItem('xaerisoft_history', JSON.stringify(history));
-    } catch(e) {
-        console.warn("LocalStorage penuh, membersihkan riwayat lama...");
-        localStorage.clear();
-    }
-    
-    loadHistoryUI();
-}
-
-function loadHistoryUI() {
-    let history = JSON.parse(localStorage.getItem('xaerisoft_history') || '[]');
-    if (history.length > 0) {
-        historySection.style.display = 'block';
-        historyGallery.innerHTML = '';
-        history.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'history-item';
-            div.innerHTML = `
-                <img src="${item.thumb}" alt="History">
-                <div class="hist-date">${item.date}</div>
-            `;
-            historyGallery.appendChild(div);
-        });
-    }
-}
-
-// Jalankan load pertama kali
-window.onload = loadHistoryUI;
