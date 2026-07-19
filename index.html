@@ -1,102 +1,182 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>✨ XAERISOFT IMAGE ENHANCER PRO</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XAERISOFT | Premium AI HD Enhancer</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Background Animations -->
-    <div class="universe-bg"></div>
-    <div class="stars" id="particles"></div>
-    <div class="mouse-glow" id="mouseGlow"></div>
 
-    <main class="app-container">
-        <!-- Header -->
-        <header class="glass-panel">
-            <h1> XAERISOFT <span>Enchanced</span></h1>
-            <p>Tahap ini sedang uji coba</p>
-        </header>
+<!-- Cosmic Universe Background -->
+<div class="cosmic-bg">
+  <div class="stars stars-1"></div>
+  <div class="stars stars-2"></div>
+  <div class="stars stars-3"></div>
+  <div class="nebula nebula-1"></div>
+  <div class="nebula nebula-2"></div>
+</div>
 
-        <!-- Main Workspace -->
-        <div class="workspace-layout">
-            
-            <!-- Canvas/Preview Area (Sekarang di urutan pertama agar di atas saat buka di HP) -->
-            <section class="preview-panel glass-panel" id="dropZone">
-                <div class="upload-prompt" id="uploadPrompt">
-                    <div class="icon"></div>
-                    <h2>Output Gambar</h2>
-                    <p>klik disini</p>
-                    <input type="file" id="fileInput" accept="image/*" hidden>
-                </div>
+<main class="wrap">
+  <header class="header">
+    <div class="header-badge">
+      <div class="badge-dot"></div>
+      <span>XAERISOFT ENGINE</span>
+    </div>
+    <h1>Premium <span>HD Enhancer</span></h1>
+    <p>Tingkatkan kualitas visual foto & video ke resolusi maksimal menggunakan AI.</p>
+  </header>
 
-                <div class="canvas-container hidden" id="canvasContainer">
-                    <canvas id="beforeCanvas"></canvas>
-                    <canvas id="afterCanvas"></canvas>
-                    <div class="slider-handle" id="sliderHandle">
-                        <div class="slider-line"></div>
-                        <div class="slider-button">⇹</div>
-                    </div>
-                </div>
-
-                <!-- Zoom & Pan Controls -->
-                <div class="view-controls hidden" id="viewControls">
-                    <button id="zoomOut">➖</button>
-                    <span id="zoomLevel">100%</span>
-                    <button id="zoomIn">➕</button>
-                    <button id="resetView">⟲</button>
-                </div>
-            </section>
-
-            <!-- Tools Panel (Di urutan kedua agar di bawah saat buka di HP) -->
-            <aside class="controls-panel glass-panel">
-                <div class="control-group">
-                    <h3>Enchancer Model</h3>
-                    <div class="btn-group grid-2">
-                        <button class="scale-btn active" data-scale="1">1×</button>
-                        <button class="scale-btn" data-scale="2">2×</button>
-                        <button class="scale-btn" data-scale="4">4×</button>
-                        <button class="scale-btn" data-scale="8">8×</button>
-                        <button class="scale-btn" data-scale="10">10×</button>
-                        <button class="scale-btn" data-scale="12">12×</button>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <h3>Ekspor Rasio Gambar</h3>
-                    <div class="btn-group grid-2">
-                        <button class="quality-btn" data-quality="0.5">50%</button>
-                        <button class="quality-btn" data-quality="0.75">75%</button>
-                        <button class="quality-btn" data-quality="0.9">90%</button>
-                        <button class="quality-btn active" data-quality="1">100%</button>
-                    </div>
-                </div>
-
-                <div class="control-group actions">
-                    <button id="processBtn" class="neon-btn primary" disabled>🚀 Input Gambar</button>
-                    <button id="downloadBtn" class="neon-btn secondary" disabled>💾 Download</button>
-                </div>
-            </aside>
-
-        </div>
-    </main>
-
-    <!-- Processing Overlay -->
-    <div class="processing-overlay hidden" id="loadingOverlay">
-        <div class="ai-core">
-            <div class="core-ring core-ring-1"></div>
-            <div class="core-ring core-ring-2"></div>
-            <div class="core-ring core-ring-3"></div>
-            <div class="core-glow"></div>
-        </div>
-        <h2 class="status-text" id="statusText">Proses...</h2>
-        <div class="progress-bar-coantainer">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <p class="eta" id="etaText">Waktu Estimasi: Menghitung...</p>
+  <section class="card glass-panel">
+    <!-- Type Selector -->
+    <div class="type-tabs">
+      <button class="type-tab active" id="tabPhoto" aria-label="Mode Foto">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>Foto</span>
+      </button>
+      <button class="type-tab" id="tabVideo" aria-label="Mode Video">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <span>Video</span>
+      </button>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Drop Zone -->
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="mediaFile" accept="image/jpeg, image/png, image/webp" hidden>
+      
+      <div class="dz-preview" id="dzPreview">
+        <img id="dzPreviewImg" src="" alt="Preview" style="display:none;">
+        <video id="dzPreviewVid" src="" muted playsinline loop style="display:none;"></video>
+        <div class="dz-preview-overlay">
+          <div class="dz-preview-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="dzPreviewLabelText">File dimuat — klik untuk mengubah</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dz-content" id="dzContent">
+        <div class="dz-icon-wrapper">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </div>
+        <strong id="dzTitle">Tarik & Lepas File Disini</strong>
+        <span id="dzSub">Format didukung: JPG, PNG, WEBP</span>
+      </div>
+    </div>
+
+    <!-- Video Alert -->
+    <div class="alert-box" id="videoNote">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <p>Video diproses secara *frame-by-frame*. Disarankan maksimal 30 detik untuk performa optimal.</p>
+    </div>
+
+    <!-- Configuration -->
+    <div class="config-wrap">
+      <label class="config-label">
+        Tingkat Enhancement (AI)
+      </label>
+      <div class="select-container">
+        <select class="premium-select" id="kaliSelect">
+          <option value="1">1x — Standar (Rekomendasi)</option>
+          <option value="2">2x — Ultra HD</option>
+          <option value="3">3x — Extreme Detail</option>
+          <option value="4">4x — Maximum AI</option>
+          <option value="5">5x — Experimental</option>
+        </select>
+        <div class="select-arrow"></div>
+      </div>
+      <div class="eta-hint" id="kaliHint">Estimasi proses: ~15 detik</div>
+    </div>
+
+    <div class="error-bar" id="errorBar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <span id="errorText">Terjadi kesalahan sistem.</span>
+    </div>
+
+    <button class="btn-primary" id="enhanceBtn" disabled>
+      <span class="btn-glow"></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+      </svg>
+      Jalankan AI Engine
+    </button>
+  </section>
+
+  <!-- Results Area -->
+  <section class="result-section glass-panel" id="resultSection">
+    <div class="section-divider"><span>HASIL ANALISIS VISUAL</span></div>
+
+    <!-- Photo Comparison -->
+    <div id="photoResult" class="result-container">
+      <div class="comparison-wrap" id="compWrap">
+        <img class="comp-after" id="compAfter" src="" alt="After Enhancement">
+        <div class="comp-before-clip" id="compBeforeClip">
+          <img id="compBefore" src="" alt="Before Enhancement">
+        </div>
+        <div class="comp-divider" id="compDivider">
+          <div class="comp-handle" id="compHandle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#050816" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="15 18 9 12 15 6"/>
+              <polyline points="9 6 15 12 9 18" transform="translate(0,0)"/>
+            </svg>
+          </div>
+        </div>
+        <div class="comp-badge badge-left">Original</div>
+        <div class="comp-badge badge-right">XAERISOFT HD</div>
+      </div>
+      <p class="drag-hint">Geser *slider* untuk melihat perbedaan</p>
+    </div>
+
+    <!-- Video Result -->
+    <div class="video-result-wrap" id="videoResult">
+      <div class="video-grid">
+        <div class="video-box">
+          <span class="video-badge">Original</span>
+          <video id="vidBefore" controls muted playsinline loop></video>
+        </div>
+        <div class="video-box highlight">
+          <span class="video-badge accent">XAERISOFT HD</span>
+          <video id="vidAfter" controls muted playsinline loop></video>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-grid">
+      <button class="btn-action btn-download" id="downloadBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Simpan Hasil
+      </button>
+      <button class="btn-action btn-reset" id="resetBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        File Baru
+      </button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    © 2026 XAERISOFT. By wilxd All right Reversed
+  </footer>
+</main>
+
+<!-- Modern Loading State -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="glass-loader">
+    <div class="spinner-ring"></div>
+    <div class="loading-core"></div>
+  </div>
+  <h2 class="loading-title" id="loadingTitle">Inisialisasi Engine...</h2>
+  <p class="loading-sub" id="loadingSub">Menghubungkan ke server AI</p>
+  
+  <div class="progress-container" id="loadingRounds" style="display:none">
+    <div class="progress-track" id="roundsTrack"></div>
+    <p class="progress-text" id="roundsText"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
